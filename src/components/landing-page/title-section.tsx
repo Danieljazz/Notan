@@ -1,9 +1,9 @@
 import React from "react";
 
 type TitleSectionProps = {
-  heading: string;
+  heading?: string;
   subheading?: string;
-  pill: string;
+  pill?: string;
 };
 
 const TitleSection: React.FC<TitleSectionProps> = ({
@@ -20,18 +20,22 @@ const TitleSection: React.FC<TitleSectionProps> = ({
       items-start
       md:items-center"
     >
-      <article
-        className="rounded-full 
+      {pill && (
+        <article
+          className="rounded-full 
         p-[.15em]
         text-sm
         dark:bg-gradient-to-r
         dark:from-brand-primaryBlue
         dark:to-brand-primaryPurple"
-      >
-        <div className="rounded-full dark:bg-black p-[.7em] flex justify-center">
-          {pill}
-        </div>
-      </article>
+        >
+          (
+          <div className="rounded-full dark:bg-black p-[.7em] flex justify-center">
+            {pill}
+          </div>
+          )
+        </article>
+      )}
       <h1 className="text-left text-6xl font-semibold">{heading}</h1>
       {subheading ? (
         <>

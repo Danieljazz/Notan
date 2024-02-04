@@ -5,8 +5,9 @@ import Logo from "../../../public/Notan.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { Form, useForm, SubmitHandler } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import {
+  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -43,12 +44,12 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="rounded-full p-2 bg-">
+    <div className="h-[100%]">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           onChange={() => submitError && setSubmitError("")}
-          className="flex items-center justify-center flex-col border-brand-primaryPurple border-2  rounded-xl p-16"
+          className="h-[100%] flex items-center justify-center flex-col border-brand-primaryPurple border-2  rounded-xl p-16"
         >
           <Link href="/">
             <Image className="w-auto max-h-60" src={Logo} alt="Notan"></Image>
