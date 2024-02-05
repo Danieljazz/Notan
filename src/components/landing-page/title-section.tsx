@@ -29,11 +29,9 @@ const TitleSection: React.FC<TitleSectionProps> = ({
         dark:from-brand-primaryBlue
         dark:to-brand-primaryPurple"
         >
-          (
           <div className="rounded-full dark:bg-black p-[.7em] flex justify-center">
             {pill}
           </div>
-          )
         </article>
       )}
       <h1 className="text-left text-6xl font-semibold">{heading}</h1>

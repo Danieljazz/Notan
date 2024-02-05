@@ -19,20 +19,20 @@ import Loader from "../loader";
 import { Button } from "../ui/button";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormSchema } from "@/lib/types";
+import { LoginSchema } from "@/lib/types";
 import { loginUser } from "@/lib/server-action/auth-actions";
 
 const LoginForm = () => {
   const [submitError, setSubmitError] = useState("");
   const router = useRouter();
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<z.infer<typeof LoginSchema>>({
     mode: "onChange",
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(LoginSchema),
     defaultValues: { email: "", password: "" },
   });
 
   const isSubmitting = form.formState.isSubmitting;
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (
+  const onSubmit: SubmitHandler<z.infer<typeof LoginSchema>> = async (
     formData
   ) => {
     const { error } = await loginUser(formData);
