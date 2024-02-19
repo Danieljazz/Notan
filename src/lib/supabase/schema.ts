@@ -7,7 +7,7 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { prices, subscriptionStatus, users } from "../../../migrations/schema";
+import { prices, subscriptionStatus, users } from "../../../drizzle/schema";
 import { sql } from "drizzle-orm";
 
 export const workspaces = pgTable("workspaces", {

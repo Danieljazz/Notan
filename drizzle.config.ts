@@ -8,7 +8,7 @@ if (!process.env.DB_URL) console.log("Cannot migrate db :(");
 export default {
   schema: "./src/lib/supabase/schema.ts",
   out: "./migrations",
-  driver: "pg",
+  driver: "mysql",
   dbCredentials: {
     connectionString: process.env.DB_URL || "",
   },
