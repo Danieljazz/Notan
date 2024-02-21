@@ -1,13 +1,1 @@
-{
-  "version": "5",
-  "dialect": "mysql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "5",
-      "when": 1708457646671,
-      "tag": "0000_slimy_abomination",
-      "breakpoints": true
-    }
-  ]
-}
+{"version":"5","dialect":"mysql","entries":[{"idx":0,"version":"5","when":1708457646671,"tag":"0000_slimy_abomination","breakpoints":true},{"idx":1,"version":"5","when":1708544013408,"tag":"0001_far_blackheart","breakpoints":true},{"idx":2,"version":"5","when":1708544160755,"tag":"0002_broken_wallop","breakpoints":true}]}

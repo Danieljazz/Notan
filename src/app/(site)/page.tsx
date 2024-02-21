@@ -1,3 +1,5 @@
+"use server";
+
 import TitleSection from "@/components/landing-page/title-section";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -7,7 +9,30 @@ import CheckIcon from "../../../public/check.svg";
 import { CLIENTS, PRICING_CARDS, USERS } from "@/lib/constants";
 import ReviewCard from "@/components/landing-page/review-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { drizzle } from "drizzle-orm/mysql2";
+import * as schema from "../../lib/mysql/schema";
+import { createConnection } from "mysql2";
+
+const connection = createConnection({
+  host: process.env.DB_HOST as string,
+  port: Number(process.env.DB_PORT),
+  user: process.env.DB_USER as string,
+  password: process.env.DB_PASSWORD as string,
+  database: process.env.DB_DATABASE as string,
+});
+
+const db = drizzle(connection, { schema: schema, mode: "default" });
+
 const HomePage = () => {
+  const getUsers = async () => {
+    "use server";
+    console.log(
+      await db.query.users.findMany({
+        where: (users, { eq }) => eq(users.id, 1),
+      })
+    );
+  };
+  getUsers();
   const params = {
     heading: "All in one Collaboration and Producitivity platform :)",
     pill: "🪄 This is your personal space to collect data",

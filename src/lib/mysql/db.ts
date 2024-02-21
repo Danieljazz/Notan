@@ -13,7 +13,7 @@ const connection = createConnection({
   port: Number(process.env.DB_PORT),
   user: process.env.DB_USER as string,
   password: process.env.DB_PASSWORD as string,
-  database: process.env.DB_URL as string,
+  database: process.env.DB_DATABASE as string,
 });
 
 const db = drizzle(connection);

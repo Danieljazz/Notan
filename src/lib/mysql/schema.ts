@@ -8,16 +8,18 @@ import {
   json,
   bigint,
   int,
+  varchar,
 } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey().notNull(),
-  fullName: text("full_name"),
+  name: text("name"),
+  surname: text("surname"),
   avatarUrl: text("avatar_url"),
   billingAddress: json("billing_address"),
-  updatedAt: timestamp("updated_at", { mode: "string" }),
+  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
   paymentMethod: json("payment_method"),
-  email: text("email"),
+  email: varchar("email", { length: 256 }).unique(),
 });
 
 export const workspaces = mysqlTable("workspaces", {
