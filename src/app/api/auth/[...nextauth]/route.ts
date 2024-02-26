@@ -3,11 +3,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { redirect } from "next/navigation";
 
 export const authOptions = {
-  // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
-      name: "sign in",
-      credentials: { email: {}, passwird: {} },
+      name: "Sign in",
+      credentials: { email: { label: "Username", type: "text" }, password: {} },
       async authorize(credentials) {
         redirect("/site");
         return null;
