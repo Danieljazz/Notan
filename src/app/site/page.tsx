@@ -24,15 +24,6 @@ const connection = createConnection({
 const db = drizzle(connection, { schema: schema, mode: "default" });
 
 const HomePage = () => {
-  const getUsers = async () => {
-    "use server";
-    console.log(
-      await db.query.users.findMany({
-        where: (users, { eq }) => eq(users.id, 1),
-      })
-    );
-  };
-  getUsers();
   const params = {
     heading: "All in one Collaboration and Producitivity platform :)",
     pill: "🪄 This is your personal space to collect data",

@@ -30,7 +30,6 @@ export async function POST(request: Request) {
       );
     return NextResponse.json({
       message: { id: user.id, name: user.name },
-      status: 200,
     });
   } catch (e) {
     return NextResponse.json(
