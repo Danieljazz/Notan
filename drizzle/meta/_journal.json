@@ -8,6 +8,48 @@
       "when": 1708457646671,
       "tag": "0000_slimy_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1708544013408,
+      "tag": "0001_far_blackheart",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1708544160755,
+      "tag": "0002_broken_wallop",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1708623701873,
+      "tag": "0003_cold_leper_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1708628832249,
+      "tag": "0004_previous_miss_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1708630860665,
+      "tag": "0005_greedy_wither",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1708630935869,
+      "tag": "0006_bitter_ikaris",
+      "breakpoints": true
     }
   ]
 }
