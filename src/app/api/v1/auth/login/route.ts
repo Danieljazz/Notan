@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       { algorithm: "HS256" }
     );
     nextcookies.set({
-      name: "credits",
+      name: "notan-credentials",
       value: cookie,
       httpOnly: true,
       secure: true,
