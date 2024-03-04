@@ -20,7 +20,6 @@ import { Button } from "../ui/button";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@/lib/types";
-import { loginUser } from "@/lib/server-action/auth-actions";
 
 const LoginForm = () => {
   const [submitError, setSubmitError] = useState("");
@@ -35,11 +34,6 @@ const LoginForm = () => {
   const onSubmit: SubmitHandler<z.infer<typeof LoginSchema>> = async (
     formData
   ) => {
-    const { error } = await loginUser(formData);
-    if (error) {
-      form.reset();
-      setSubmitError(error.message);
-    }
     router.replace("/dashboard");
   };
 

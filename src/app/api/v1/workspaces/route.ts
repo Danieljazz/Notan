@@ -5,11 +5,6 @@ import db from "@/lib/mysql/db";
 import { eq } from "drizzle-orm";
 import { workspaces, users } from "@/lib/mysql/schema";
 
-type JWTProps = {
-  id: number;
-  name: string;
-};
-
 export function GET() {
   const nextCookies = cookies();
   const jwtToken = nextCookies.get("notan-credentials");
@@ -22,7 +17,7 @@ export function GET() {
           status: 403,
           message: "Unathoritized user!",
         });
-      const userInfo = decoded as JWTProps;
+      const userInfo = decoded;
       db.query.workspaces.findMany({
         where: eq(workspaces.workspaceOwner, userInfo.id),
       });
