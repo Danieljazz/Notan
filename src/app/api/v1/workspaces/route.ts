@@ -3,7 +3,8 @@ import * as jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/mysql/db";
 import { eq } from "drizzle-orm";
-import { workspaces, users } from "@/lib/mysql/schema";
+import { workspaces } from "@/lib/mysql/schema";
+import { JwtProps } from "@/lib/utils";
 
 export function GET() {
   const nextCookies = cookies();
@@ -17,7 +18,7 @@ export function GET() {
           status: 403,
           message: "Unathoritized user!",
         });
-      const userInfo = decoded;
+      const userInfo = decoded as JwtProps;
       db.query.workspaces.findMany({
         where: eq(workspaces.workspaceOwner, userInfo.id),
       });
@@ -37,7 +38,7 @@ export function POST(request: NextRequest) {
           status: 403,
           message: "Unathoritized user!",
         });
-      const userInfo = decoded as JWTProps;
+      const userInfo = decoded as JwtProps;
       const requestData = await request.json();
       requestData["workspaceOwner"] = userInfo.id;
       db.insert(workspaces).values(requestData);
