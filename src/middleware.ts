@@ -2,13 +2,13 @@ import { verifyJwt } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export const middleware = (request: NextRequest) => {
+export const middleware = async (request: NextRequest) => {
   const path = request.nextUrl.pathname;
   const allowedPath = ["/site", "/auth"];
   const nextCookies = cookies();
   const jwtToken = nextCookies.get("notan-credentials")?.value;
-  console.log(jwtToken);
-  const decodedToken = verifyJwt(jwtToken);
+  const decodedToken = await verifyJwt(jwtToken);
+  console.log(decodedToken);
   if (!decodedToken && !allowedPath.includes(path)) {
     if (!path.startsWith("/api/v1/auth"))
       return NextResponse.json(

@@ -4,11 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/mysql/db";
 import { eq } from "drizzle-orm";
 import { workspaces } from "@/lib/mysql/schema";
-import { JwtProps } from "@/lib/utils";
+import { JwtProps, verifyJwt } from "@/lib/utils";
 
-export function GET() {
-  const nextCookies = cookies();
-  const jwtToken = nextCookies.get("notan-credentials");
+export async function GET() {
+  const jwtToken = cookies().get("notan-credentials")?.value;
+  const decodedToken = await verifyJwt(jwtToken);
+  return NextResponse.json({ message: decodedToken });
   jwt.verify(
     JSON.stringify(jwtToken),
     JSON.stringify(process.env.JWT_SECRET),

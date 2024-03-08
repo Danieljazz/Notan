@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import * as jwt from "jsonwebtoken";
+import * as jose from "jose";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 export function cn(...inputs: ClassValue[]) {
@@ -12,16 +12,18 @@ export type JwtProps = {
   name: string;
 };
 
-export const verifyJwt = (token: String | undefined): null | JwtProps => {
-  let decoded = null;
+export const verifyJwt = async (
+  token: String | undefined
+): Promise<null | JwtProps> => {
+  let generateKey = new TextEncoder().encode(process.env.JWT_SECRET);
   try {
-    decoded = jwt.verify(
+    const { payload }: { payload: JwtProps } = await jose.jwtVerify(
       String(token),
-      String(process.env.JWT_SECRET)
-    ) as JwtProps;
+      generateKey
+    );
+    return payload?.id ? payload : null;
   } catch (e) {
-    console.log(e);
+    console.log("Error: ", e);
     return null;
   }
-  return decoded?.id ? decoded : null;
 };

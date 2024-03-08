@@ -5,7 +5,7 @@ import { users } from "@/lib/mysql/schema";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import CryptoJS from "crypto-js";
-import * as jwt from "jsonwebtoken";
+import * as jose from "jose";
 import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
@@ -31,14 +31,16 @@ export async function POST(request: Request) {
         { message: "Wrong credentials" },
         { status: 403 }
       );
-    const cookie = jwt.sign(
-      { id: user.id, name: user.name },
-      String(process.env.JWT_SECRET),
-      { algorithm: "HS256" }
-    );
+    const secretKey = new TextEncoder().encode(process.env.JWT_SECRET);
+    const token = await new jose.SignJWT({
+      id: user.id,
+      name: user.name,
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .sign(secretKey);
     nextcookies.set({
       name: "notan-credentials",
-      value: cookie,
+      value: token,
       httpOnly: true,
       secure: true,
     });
