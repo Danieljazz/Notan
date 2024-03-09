@@ -1,4 +1,4 @@
-import { verifyJwt } from "@/lib/utils";
+import { verifyJwt } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
