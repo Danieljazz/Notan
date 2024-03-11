@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       password,
       process.env.PA_SALT!
     ).toString();
+    console.log(data["billing_address"]);
     await db.execute(
       sql`INSERT INTO users(name, surname, avatar_url, billing_address, payment_method, email, password	)  values (${
         data["name"]

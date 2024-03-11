@@ -10,7 +10,7 @@ export const middleware = async (request: NextRequest) => {
   const decodedToken = await verifyJwt(jwtToken);
   console.log(decodedToken);
   if (!decodedToken && !allowedPath.includes(path)) {
-    if (!path.startsWith("/api/v1/auth"))
+    if (!path.startsWith("/api/v1/auth") && path.startsWith("/api"))
       return NextResponse.json(
         { message: "User not logged in!" },
         { status: 403 }
