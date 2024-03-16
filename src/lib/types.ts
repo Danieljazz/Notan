@@ -23,3 +23,12 @@ export const RegisterSchema = z
         path: ["confirmPassword"],
       });
   });
+
+export const WorkspaceSchema = z.object({
+  workspaceOwner: z.number(),
+  title: z.string(),
+  icon: z.string(),
+  inTrash: z.number(),
+  logo: z.string(),
+  bannerUrl: z.string(),
+});

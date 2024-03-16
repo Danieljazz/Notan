@@ -9,6 +9,7 @@ import {
   bigint,
   int,
   varchar,
+  tinyint,
 } from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
@@ -44,7 +45,7 @@ export const workspaces = mysqlTable("workspaces", {
     .notNull(),
   title: text("title").notNull(),
   icon: text("icon"),
-  inTrash: boolean("in_trash"),
+  inTrash: tinyint("in_trash"),
   logo: text("logo"),
   bannerUrl: text("banner_url"),
 });

@@ -2,21 +2,21 @@ import { cookies } from "next/headers";
 import * as jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/mysql/db";
-import { and, eq } from "drizzle-orm";
+import { InferSelectModel, and, eq } from "drizzle-orm";
 import { workspaces } from "@/lib/mysql/schema";
 import { JwtProps, verifyJwt } from "@/lib/auth";
-import { NextApiRequest, NextApiResponse } from "next";
+import * as z from "zod";
+import { WorkspaceSchema } from "@/lib/types";
 
 export async function GET() {}
 
-export async function POST(request: NextRequest) {}
-
-export async function DELETE(
-  request: NextApiRequest,
+export async function PUT(
+  request: NextRequest,
   { params }: { params: { workspaceId: string[] } }
 ) {
+  const requestData: InferSelectModel<typeof workspaces> = await request.json();
+  const { workspaceOwner, ...updateData } = requestData;
   const workspaceId = Number(params.workspaceId[0]);
-  console.log(workspaceId);
   const jwtToken = cookies().get("notan-credentials")?.value;
   const decodedToken = await verifyJwt(jwtToken);
   if (!decodedToken)
@@ -24,13 +24,52 @@ export async function DELETE(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
-  const userWorkspaces = await db.query.workspaces.findMany({
+  const userWorkspaces = await db.query.workspaces.findFirst({
     where: and(
       eq(workspaces.id, workspaceId),
       eq(workspaces.workspaceOwner, decodedToken.id)
     ),
   });
-  if (userWorkspaces.length === 0)
+
+  if (!userWorkspaces || !WorkspaceSchema.safeParse(requestData).success)
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
+  console.log(updateData);
+  return await db
+    .update(workspaces)
+    .set(updateData)
+    .where(eq(workspaces.id, workspaceId))
+    .then(() =>
+      NextResponse.json({ message: "Workspace edited!" }, { status: 201 })
+    )
+    .catch((e) => NextResponse.json({ message: e }, { status: 500 }));
+}
+
+export async function DELETE(
+  request: NextRequest,
+  {
+    params,
+  }: {
+    params: { workspaceId: string[] };
+  }
+) {
+  const workspaceId = Number(params.workspaceId[0]);
+  const jwtToken = cookies().get("notan-credentials")?.value;
+  const decodedToken = await verifyJwt(jwtToken);
+  if (!decodedToken)
+    return NextResponse.json(
+      { message: "Unathoritized user!" },
+      { status: 403 }
+    );
+  const userWorkspaces = await db.query.workspaces.findFirst({
+    where: and(
+      eq(workspaces.id, workspaceId),
+      eq(workspaces.workspaceOwner, decodedToken.id)
+    ),
+  });
+  if (!userWorkspaces)
     return NextResponse.json(
       { message: "Action not allowed!" },
       { status: 403 }
