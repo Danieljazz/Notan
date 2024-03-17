@@ -28,6 +28,8 @@
     "crypto-js": "^4.2.0",
     "dotenv": "^16.3.1",
     "drizzle-orm": "^0.29.3",
+    "jose": "^5.2.3",
+    "json-schema-to-typescript": "^13.1.2",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.292.0",
     "mysql2": "^3.9.1",
@@ -41,6 +43,7 @@
     "react-hook-form": "^7.48.2",
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7",
+    "winston": "^3.12.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

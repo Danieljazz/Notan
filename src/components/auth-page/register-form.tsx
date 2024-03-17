@@ -20,7 +20,6 @@ import { Button } from "../ui/button";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterSchema } from "@/lib/types";
-import { loginUser } from "@/lib/server-action/auth-actions";
 
 const RegisterForm = () => {
   const [submitError, setSubmitError] = useState("");
@@ -41,11 +40,6 @@ const RegisterForm = () => {
     formData
   ) => {
     console.log("lesgo");
-    const { error } = await loginUser(formData);
-    if (error) {
-      form.reset();
-      setSubmitError(error.message);
-    }
     router.replace("/dashboard");
   };
 
