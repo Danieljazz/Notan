@@ -77,11 +77,7 @@ export const files = mysqlTable("files", {
   inTrash: boolean("in_trash"),
   logo: text("logo"),
   bannerUrl: text("banner_url"),
-  workspaceId: int("workspace_id")
-    .references(() => workspaces.id, {
-      onDelete: "cascade",
-    })
-    .notNull(),
+  data: text("data"),
   folderId: int("folder_id")
     .references(() => folders.id, {
       onDelete: "cascade",
