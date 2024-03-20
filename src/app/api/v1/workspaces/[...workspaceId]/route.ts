@@ -1,11 +1,14 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/mysql/db";
-import { InferSelectModel, and, eq } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import { workspaces } from "@/lib/mysql/schema";
 import { verifyJwt } from "@/lib/auth";
 import { WorkspaceSchema } from "@/lib/types";
-import { getWorkspaceDetails, updateWorkspace } from "@/lib/mysql/dbQueries";
+import {
+  deleteWorkspace,
+  getWorkspaceDetails,
+  updateWorkspace,
+} from "@/lib/mysql/dbQueries";
 
 export async function GET(
   request: NextRequest,
@@ -71,20 +74,7 @@ export async function DELETE(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
-  const userWorkspaces = await db.query.workspaces.findFirst({
-    where: and(
-      eq(workspaces.id, workspaceId),
-      eq(workspaces.workspaceOwner, decodedToken.id)
-    ),
-  });
-  if (!userWorkspaces)
-    return NextResponse.json(
-      { message: "Action not allowed!" },
-      { status: 403 }
-    );
-  return await db
-    .delete(workspaces)
-    .where(eq(workspaces.id, workspaceId))
+  return deleteWorkspace(decodedToken, workspaceId)
     .then(() =>
       NextResponse.json({ message: "Workspace deleted!" }, { status: 201 })
     )
