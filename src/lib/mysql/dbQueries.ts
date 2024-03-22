@@ -1,6 +1,6 @@
 import { InferSelectModel, and, eq } from "drizzle-orm";
 import db from "./db";
-import { workspaces } from "./schema";
+import { files, folders, workspaces } from "./schema";
 import { JwtProps } from "../auth";
 import { NextResponse } from "next/server";
 import { WorkspaceSchema } from "../types";
@@ -60,4 +60,22 @@ export const deleteWorkspace = async (
       { status: 403 }
     );
   return await db.delete(workspaces).where(eq(workspaces.id, workspaceId));
+};
+
+export const getWorkspaceFolders = async (
+  decodedToken: JwtProps,
+  workspaceId: number
+) => {
+  if (!(workspaceId in getAllUserWorkspaces(decodedToken)))
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
+  return db
+    .select()
+    .from(folders)
+    .leftJoin(
+      files,
+      and(eq(folders.workspaceId, workspaceId), eq(files.folderId, folders.id))
+    );
 };
