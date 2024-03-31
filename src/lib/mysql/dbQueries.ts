@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 import { WorkspaceSchema } from "../types";
 
 export const getAllUserWorkspaces = async (decodedToken: JwtProps) => {
-  return db.query.workspaces.findMany({
+  return await db.query.workspaces.findMany({
     where: eq(workspaces.workspaceOwner, decodedToken.id),
   });
 };
@@ -21,12 +21,7 @@ export const getWorkspaceDetails = async (
   decodedToken: JwtProps,
   workspaceId: number
 ) => {
-  return db.query.workspaces.findFirst({
-    where: and(
-      eq(workspaces.workspaceOwner, decodedToken.id),
-      eq(workspaces.id, workspaceId)
-    ),
-  });
+  return getWorkspaceFolders(decodedToken, workspaceId);
 };
 
 export const updateWorkspace = async (
@@ -37,8 +32,7 @@ export const updateWorkspace = async (
     "id" | "createdAt" | "workspaceOwner"
   >
 ) => {
-  const userWorkspaces = await getWorkspaceDetails(decodedToken, workspaceId);
-  if (!userWorkspaces)
+  if (!(workspaceId in getAllUserWorkspaces(decodedToken)))
     return NextResponse.json(
       { message: "Action not allowed!" },
       { status: 403 }
@@ -53,8 +47,7 @@ export const deleteWorkspace = async (
   decodedToken: JwtProps,
   workspaceId: number
 ) => {
-  const userWorkspaces = await getWorkspaceDetails(decodedToken, workspaceId);
-  if (!userWorkspaces)
+  if (!(workspaceId in getAllUserWorkspaces(decodedToken)))
     return NextResponse.json(
       { message: "Action not allowed!" },
       { status: 403 }
@@ -62,7 +55,7 @@ export const deleteWorkspace = async (
   return await db.delete(workspaces).where(eq(workspaces.id, workspaceId));
 };
 
-export const getWorkspaceFolders = async (
+export const getWorkspaceFolders = (
   decodedToken: JwtProps,
   workspaceId: number
 ) => {
@@ -77,5 +70,27 @@ export const getWorkspaceFolders = async (
     .leftJoin(
       files,
       and(eq(folders.workspaceId, workspaceId), eq(files.folderId, folders.id))
+    );
+};
+
+export const createFolder = async (
+  decodedToken: JwtProps,
+  folderData: Omit<InferSelectModel<typeof folders>, "id" | "createdAt">
+) => {
+  if (
+    !(await getAllUserWorkspaces(decodedToken))
+      .map((workspace) => workspace.id)
+      .includes(folderData["workspaceId"])
+  )
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
+  return db
+    .insert(folders)
+    .values(folderData)
+    .then(() => NextResponse.json({ message: folderData }, { status: 201 }))
+    .catch((e) =>
+      NextResponse.json({ message: "Internal server error" }, { status: 500 })
     );
 };

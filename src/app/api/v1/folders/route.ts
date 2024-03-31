@@ -1,11 +1,21 @@
 import { verifyJwt } from "@/lib/auth";
-import db from "@/lib/mysql/db";
-import { and, eq } from "drizzle-orm";
+import { createFolder, getWorkspaceFolders } from "@/lib/mysql/dbQueries";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-// get all user folders
-export async function GET() {
+export async function POST(request: NextRequest) {
+  const folderData = await request.json();
+  console.log("new folder data", folderData);
   const jwtToken = cookies().get("notan-credentials")?.value;
   const decodedToken = await verifyJwt(jwtToken);
+  if (!decodedToken)
+    return NextResponse.json(
+      { message: "Unathoritized user!" },
+      { status: 403 }
+    );
+  return await createFolder(decodedToken, folderData)
+    .then((userWorkspaces) => userWorkspaces)
+    .catch(() =>
+      NextResponse.json({ message: "Internal server error" }, { status: 500 })
+    );
 }

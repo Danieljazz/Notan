@@ -45,7 +45,7 @@ export const workspaces = mysqlTable("workspaces", {
     .notNull(),
   title: text("title").notNull(),
   icon: text("icon"),
-  inTrash: tinyint("in_trash"),
+  inTrash: boolean("in_trash").default(false),
   logo: text("logo"),
   bannerUrl: text("banner_url"),
 });
@@ -57,7 +57,7 @@ export const folders = mysqlTable("folders", {
   }).defaultNow(),
   title: text("title"),
   icon: text("icon"),
-  inTrash: boolean("in_trash"),
+  inTrash: boolean("in_trash").default(false),
   logo: text("logo"),
   bannerUrl: text("banner_url"),
   workspaceId: int("workspace_id")
@@ -74,7 +74,7 @@ export const files = mysqlTable("files", {
   }).defaultNow(),
   title: text("title"),
   icon: text("icon"),
-  inTrash: boolean("in_trash"),
+  inTrash: boolean("in_trash").default(false),
   logo: text("logo"),
   bannerUrl: text("banner_url"),
   data: text("data"),
