@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const folderData = await request.json();
-  console.log("new folder data", folderData);
   const jwtToken = cookies().get("notan-credentials")?.value;
   const decodedToken = await verifyJwt(jwtToken);
   if (!decodedToken)

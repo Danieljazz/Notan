@@ -94,3 +94,24 @@ export const createFolder = async (
       NextResponse.json({ message: "Internal server error" }, { status: 500 })
     );
 };
+
+export const deleteFolder = async (
+  decodedToken: JwtProps,
+  folderId: number
+) => {
+  const dbResult = await db
+    .select()
+    .from(folders)
+    .where(eq(folders.id, folderId));
+  const { workspaceId } = dbResult[0];
+  if (
+    !(await getAllUserWorkspaces(decodedToken))
+      .map((workspace) => workspace.id)
+      .includes(workspaceId)
+  )
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
+  return await db.delete(folders).where(eq(folders.id, folderId));
+};
