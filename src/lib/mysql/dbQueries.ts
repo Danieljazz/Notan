@@ -73,6 +73,23 @@ export const getWorkspaceFolders = (
     );
 };
 
+export const getFolder = async (decodedToken: JwtProps, folderId: number) => {
+  const foldersWorkspaceId = await db
+    .select()
+    .from(folders)
+    .where(eq(folders.id, folderId));
+  if (
+    !(await getAllUserWorkspaces(decodedToken))
+      .map((workspace) => workspace.id)
+      .includes(foldersWorkspaceId[0]?.workspaceId)
+  )
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
+  return foldersWorkspaceId;
+};
+
 export const createFolder = async (
   decodedToken: JwtProps,
   folderData: Omit<InferSelectModel<typeof folders>, "id" | "createdAt">
