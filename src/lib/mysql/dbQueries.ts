@@ -4,6 +4,8 @@ import { files, folders, workspaces } from "./schema";
 import { JwtProps } from "../auth";
 import { NextResponse } from "next/server";
 import { WorkspaceSchema } from "../types";
+import { appendFile } from "fs";
+import path from "path";
 
 export const getAllUserWorkspaces = async (decodedToken: JwtProps) => {
   return await db.query.workspaces.findMany({
@@ -131,4 +133,63 @@ export const deleteFolder = async (
       { status: 403 }
     );
   return await db.delete(folders).where(eq(folders.id, folderId));
+};
+
+export const createFile = async (
+  decodedToken: JwtProps,
+  fileData: Omit<InferSelectModel<typeof files>, "id" | "createdAt">
+) => {
+  const dbResult = await db
+    .select()
+    .from(folders)
+    .where(eq(folders.id, fileData["folderId"]));
+  if (
+    dbResult.length === 0 ||
+    !(await getAllUserWorkspaces(decodedToken))
+      .map((workspace) => workspace.id)
+      .includes(dbResult[0].workspaceId)
+  ) {
+    console.log("Action not allowed");
+    throw new Error("Action not allowed!");
+  }
+  return db.insert(files).values(fileData);
+};
+
+export const getFile = async (
+  decodedToken: JwtProps,
+  fileId: number
+): Promise<InferSelectModel<typeof files>[]> => {
+  const folderId = await db.select().from(files).where(eq(files.id, fileId));
+  const dbResult = await db
+    .select()
+    .from(folders)
+    .where(eq(folders.id, folderId[0].folderId));
+  if (
+    dbResult.length === 0 ||
+    !(await getAllUserWorkspaces(decodedToken))
+      .map((workspace) => workspace.id)
+      .includes(dbResult[0].workspaceId)
+  ) {
+    console.log("Action not allowed");
+    throw new Error("Action not allowed!");
+  }
+  return db.select().from(files).where(eq(files.id, fileId));
+};
+
+export const deleteFile = async (decodedToken: JwtProps, fileId: number) => {
+  const folderId = await db.select().from(files).where(eq(files.id, fileId));
+  const dbResult = await db
+    .select()
+    .from(folders)
+    .where(eq(folders.id, folderId[0].folderId));
+  if (
+    dbResult.length === 0 ||
+    !(await getAllUserWorkspaces(decodedToken))
+      .map((workspace) => workspace.id)
+      .includes(dbResult[0].workspaceId)
+  ) {
+    console.log("Action not allowed");
+    throw new Error("Action not allowed!");
+  }
+  return db.delete(files).where(eq(files.id, fileId));
 };
