@@ -7,6 +7,7 @@ import cryptoJS from "crypto-js";
 
 export async function POST(request: Request) {
   const data = await request.json();
+  console.log(data);
   const { email, password } = data;
   try {
     const existingUser = await db.query.users.findMany({
