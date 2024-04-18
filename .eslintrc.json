@@ -1,7 +1,7 @@
 {
   "extends": "next/core-web-vitals",
   "env": {
-    "jasmine": true,
-    "jest": true
+    "jest": true,
+    "circus": true
   }
 }

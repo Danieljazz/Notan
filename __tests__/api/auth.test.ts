@@ -1,3 +1,4 @@
+import { fail } from "assert";
 import { makeRequest } from "./utils/makeRequest";
 import { faker } from "@faker-js/faker";
 
@@ -13,16 +14,20 @@ describe("Test register", () => {
       house: 4,
     },
     payment_method: { type: "card" },
-    email: faker.internet.email,
+    email: faker.internet.email(),
     password: "hahaha",
   };
   it("Test register non existing user", async () => {
     try {
-      const data = await makeRequest.post("/auth/register", { data: userData });
-      expect(data).toBeDefined();
-      expect(data.status).toBe(201);
+      const response = await makeRequest.post(
+        "/auth/register",
+        JSON.stringify(userData)
+      );
+      expect(response).toBeDefined();
+      expect(response.status).toBe(201);
+      expect(response.data).toStrictEqual({ message: "Contact created" });
     } catch (error) {
-      throw new Error(error);
+      fail(`${error}`);
     }
     // .then((r) => {
     //   console.log(r.data);
