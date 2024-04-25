@@ -29,18 +29,21 @@ describe("Test register", () => {
     } catch (error) {
       fail(`${error}`);
     }
-    // .then((r) => {
-    //   console.log(r.data);
-    //   expect(r.data).toBeDefined();
-    //   expect(r.data.results.length).toBeGreaterThan(0);
-    //   expect(r.status).toBe(401);
-    // })
-    // .catch((e) => {
-    //   fail(`Expected successful response`);
-    // });
   });
-  it("Test register existing user", () => {
-    expect(2).toBe(2);
+  it("Test register existing user", async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/v1/auth/register",
+        { method: "POST", body: JSON.stringify(userData) }
+      );
+      expect(response).toBeDefined();
+      expect(response.status).toBe(409);
+      expect(await response.json()).toStrictEqual({
+        message: "Email already exists",
+      });
+    } catch (error) {
+      fail(`${error}`);
+    }
   });
 });
 describe("Test login", () => {
