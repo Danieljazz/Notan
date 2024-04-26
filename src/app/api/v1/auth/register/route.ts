@@ -8,6 +8,7 @@ import cryptoJS from "crypto-js";
 export async function POST(request: Request) {
   const data = await request.json();
   const { email, password } = data;
+  console.log(email);
   try {
     const existingUser = await db.query.users.findMany({
       where: (users, { eq }) => eq(users.email, email),
@@ -21,7 +22,6 @@ export async function POST(request: Request) {
       password,
       process.env.PA_SALT!
     ).toString();
-    console.log(data["billing_address"]);
     await db.execute(
       sql`INSERT INTO users(name, surname, avatar_url, billing_address, payment_method, email, password	)  values (${
         data["name"]
@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     );
     return NextResponse.json({ message: `Contact created` }, { status: 201 });
   } catch (e) {
+    console.log(e);
     return NextResponse.json(
       { message: `Server error, ${e}` },
       { status: 500 }
