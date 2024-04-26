@@ -1,10 +1,14 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import db from "@/lib/mysql/db";
-import { InferSelectModel, and, eq } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import { workspaces } from "@/lib/mysql/schema";
 import { verifyJwt } from "@/lib/auth";
 import { WorkspaceSchema } from "@/lib/types";
+import {
+  deleteWorkspace,
+  getWorkspaceDetails,
+  updateWorkspace,
+} from "@/lib/mysql/dbQueries";
 
 export async function GET(
   request: NextRequest,
@@ -18,13 +22,7 @@ export async function GET(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
-  return await db.query.workspaces
-    .findFirst({
-      where: and(
-        eq(workspaces.workspaceOwner, decodedToken.id),
-        eq(workspaces.id, workspaceId)
-      ),
-    })
+  return getWorkspaceDetails(decodedToken, workspaceId)
     .then((userWorkspaces) => NextResponse.json({ message: userWorkspaces }))
     .catch(() =>
       NextResponse.json({ message: "Internal server error" }, { status: 500 })
@@ -35,7 +33,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { workspaceId: string[] } }
 ) {
-  const requestData: InferSelectModel<typeof workspaces> = await request.json();
+  const requestData: Omit<
+    InferSelectModel<typeof workspaces>,
+    "createdAt" | "id"
+  > = await request.json();
   const { workspaceOwner, ...updateData } = requestData;
   const workspaceId = Number(params.workspaceId[0]);
   const jwtToken = cookies().get("notan-credentials")?.value;
@@ -45,22 +46,12 @@ export async function PUT(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
-  const userWorkspaces = await db.query.workspaces.findFirst({
-    where: and(
-      eq(workspaces.id, workspaceId),
-      eq(workspaces.workspaceOwner, decodedToken.id)
-    ),
-  });
-
-  if (!userWorkspaces || !WorkspaceSchema.safeParse(requestData).success)
+  if (!WorkspaceSchema.safeParse(requestData).success)
     return NextResponse.json(
       { message: "Action not allowed!" },
       { status: 403 }
     );
-  return await db
-    .update(workspaces)
-    .set(updateData)
-    .where(eq(workspaces.id, workspaceId))
+  return updateWorkspace(decodedToken, workspaceId, updateData)
     .then(() =>
       NextResponse.json({ message: "Workspace edited!" }, { status: 201 })
     )
@@ -83,20 +74,7 @@ export async function DELETE(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
-  const userWorkspaces = await db.query.workspaces.findFirst({
-    where: and(
-      eq(workspaces.id, workspaceId),
-      eq(workspaces.workspaceOwner, decodedToken.id)
-    ),
-  });
-  if (!userWorkspaces)
-    return NextResponse.json(
-      { message: "Action not allowed!" },
-      { status: 403 }
-    );
-  return await db
-    .delete(workspaces)
-    .where(eq(workspaces.id, workspaceId))
+  return deleteWorkspace(decodedToken, workspaceId)
     .then(() =>
       NextResponse.json({ message: "Workspace deleted!" }, { status: 201 })
     )

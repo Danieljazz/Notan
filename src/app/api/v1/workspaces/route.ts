@@ -4,6 +4,8 @@ import db from "@/lib/mysql/db";
 import { and, eq } from "drizzle-orm";
 import { workspaces } from "@/lib/mysql/schema";
 import { verifyJwt } from "@/lib/auth";
+import { createWorkspace, getAllUserWorkspaces } from "@/lib/mysql/dbQueries";
+import { WorkspaceSchema } from "@/lib/types";
 
 export async function GET() {
   const jwtToken = cookies().get("notan-credentials")?.value;
@@ -13,10 +15,7 @@ export async function GET() {
       { message: "Unathoritized user!" },
       { status: 403 }
     );
-  return await db.query.workspaces
-    .findMany({
-      where: eq(workspaces.workspaceOwner, decodedToken.id),
-    })
+  return getAllUserWorkspaces(decodedToken)
     .then((userWorkspaces) => {
       NextResponse.json({ message: userWorkspaces });
     })
@@ -35,9 +34,12 @@ export async function POST(request: NextRequest) {
     );
   const requestData = await request.json();
   requestData["workspaceOwner"] = decodedToken.id;
-  return db
-    .insert(workspaces)
-    .values(requestData)
+  if (!WorkspaceSchema.safeParse(requestData).success)
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
+  return createWorkspace(requestData)
     .then(() =>
       NextResponse.json({ message: "Workspace created!" }, { status: 201 })
     )
