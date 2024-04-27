@@ -46,10 +46,3 @@ describe("Test register", () => {
     }
   });
 });
-describe("Test login", () => {
-  it("Correct login", () => {});
-  it("Incorrect login", () => {});
-});
-describe("Test logout", () => {
-  it("Check remove credential cookie", () => {});
-});
