@@ -59,7 +59,7 @@ const RegisterForm = () => {
             disabled={isSubmitting}
             control={form.control}
             name="username"
-            render={(field) => (
+            render={({ field }) => (
               <FormItem className="mt-10 w-full">
                 <FormControl>
                   <Input
@@ -75,7 +75,7 @@ const RegisterForm = () => {
             disabled={isSubmitting}
             control={form.control}
             name="email"
-            render={(field) => (
+            render={({ field }) => (
               <FormItem className="mt-10 w-full">
                 <FormControl>
                   <Input type="email" placeholder="Email" {...field}></Input>
@@ -87,7 +87,7 @@ const RegisterForm = () => {
             disabled={isSubmitting}
             control={form.control}
             name="password"
-            render={(field) => (
+            render={({ field }) => (
               <FormItem className="w-full mt-10">
                 <FormControl>
                   <Input
@@ -103,7 +103,7 @@ const RegisterForm = () => {
             disabled={isSubmitting}
             control={form.control}
             name="confirmPassword"
-            render={(field) => (
+            render={({ field }) => (
               <FormItem className="mt-10 w-full">
                 <FormControl>
                   <Input

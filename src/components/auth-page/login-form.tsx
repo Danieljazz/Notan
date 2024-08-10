@@ -1,9 +1,8 @@
-"use client";
-
 import Link from "next/link";
 import Logo from "../../../public/Notan.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -20,6 +19,7 @@ import { Button } from "../ui/button";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@/lib/types";
+import { LoginApi } from "@/lib/server-action/auth-actions";
 
 const LoginForm = () => {
   const [submitError, setSubmitError] = useState("");
@@ -34,7 +34,10 @@ const LoginForm = () => {
   const onSubmit: SubmitHandler<z.infer<typeof LoginSchema>> = async (
     formData
   ) => {
-    router.replace("/dashboard");
+    console.log("Data");
+    // console.log(formData.email);
+    const res = await LoginApi(FormData);
+    res && redirect("/site");
   };
 
   return (
@@ -55,7 +58,7 @@ const LoginForm = () => {
             disabled={isSubmitting}
             control={form.control}
             name="email"
-            render={(field) => (
+            render={({ field }) => (
               <FormItem className="mt-10 w-full">
                 <FormControl>
                   <Input type="email" placeholder="Email" {...field}></Input>
@@ -67,7 +70,7 @@ const LoginForm = () => {
             disabled={isSubmitting}
             control={form.control}
             name="password"
-            render={(field) => (
+            render={({ field }) => (
               <FormItem className="w-full mt-10">
                 <FormControl>
                   <Input

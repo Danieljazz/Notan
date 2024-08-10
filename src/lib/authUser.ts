@@ -1,5 +1,7 @@
+"use client";
 import { cookies } from "next/headers";
 import { verifyJwt } from "./auth";
+import { NextResponse } from "next/server";
 
 export const authUser = async () => {
   const jwtToken = cookies().get("notan-credentials")?.value;
