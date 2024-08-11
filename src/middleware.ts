@@ -4,12 +4,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const middleware = async (request: NextRequest) => {
   const path = request.nextUrl.pathname;
-  console.log("ml started");
   const allowedPath = ["/site", "/auth"];
-  const nextCookies = cookies();
-  const jwtToken = nextCookies.get("notan-credentials")?.value;
-  const decodedToken = await verifyJwt(jwtToken);
-  console.log(decodedToken);
+  let decodedToken = null;
+  console.log(path);
+  if (path === "/api/v1/auth/login") return NextResponse.next();
+  if (!allowedPath.includes(path)) {
+    const nextCookies = cookies();
+    const jwtToken = nextCookies.get("notan-credentials")?.value;
+    decodedToken = await verifyJwt(jwtToken);
+    console.log(decodedToken);
+  }
   if (!decodedToken && !allowedPath.includes(path)) {
     if (!path.startsWith("/api/v1/auth") && path.startsWith("/api"))
       return NextResponse.json(
@@ -21,5 +25,5 @@ export const middleware = async (request: NextRequest) => {
   return NextResponse.next();
 };
 export const config = {
-  matcher: ["/((?!/site|_next/static|!/api/v1/auth|/auth|favicon.ico).*)"],
+  matcher: ["/((?!/site|_next/static|/api/v1/auth/*|/auth|favicon.ico).*)"],
 };

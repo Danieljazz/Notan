@@ -26,6 +26,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const jwtToken = cookies().get("notan-credentials")?.value;
+  console.log(jwtToken);
   const decodedToken = await verifyJwt(jwtToken);
   if (!decodedToken)
     return NextResponse.json(

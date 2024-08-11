@@ -10,7 +10,7 @@ import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();
-  console.log(email, password);
+  console.log("Email is", email);
   const nextcookies = cookies();
   try {
     const user = await db.query.users.findFirst({

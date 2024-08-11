@@ -5,6 +5,7 @@ import { workspaces } from "@/lib/mysql/schema";
 import { verifyJwt } from "@/lib/auth";
 import { WorkspaceSchema } from "@/lib/types";
 import {
+  checkIfUserIsWorkspaceOwner,
   deleteWorkspace,
   getWorkspaceDetails,
   updateWorkspace,
@@ -22,8 +23,13 @@ export async function GET(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
+  if (!(await checkIfUserIsWorkspaceOwner(decodedToken, workspaceId)))
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
   return getWorkspaceDetails(decodedToken, workspaceId)
-    .then((userWorkspaces) => NextResponse.json({ message: userWorkspaces }))
+    .then((userWorkspaces) => NextResponse.json(userWorkspaces))
     .catch(() =>
       NextResponse.json({ message: "Internal server error" }, { status: 500 })
     );

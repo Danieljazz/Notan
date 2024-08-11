@@ -14,7 +14,7 @@
     "migrate": "bun run src/lib/supabase/migration.ts",
     "check": "drizzle-kit check:mysql",
     "up": "drizzle-kit up:mysql",
-    "test": "vitest"
+    "test": "vitest workspaces"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",

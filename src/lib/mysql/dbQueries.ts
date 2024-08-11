@@ -13,6 +13,15 @@ export const getAllUserWorkspaces = async (decodedToken: JwtProps) => {
   });
 };
 
+export const checkIfUserIsWorkspaceOwner = async (
+  decodedToken: JwtProps,
+  workspaceId: number
+) => {
+  return (await getAllUserWorkspaces(decodedToken))
+    .map((workspaces) => workspaces.id)
+    .includes(workspaceId);
+};
+
 export const createWorkspace = async (
   requestData: Omit<InferSelectModel<typeof workspaces>, "id" | "createdAt">
 ) => {
@@ -57,15 +66,10 @@ export const deleteWorkspace = async (
   return await db.delete(workspaces).where(eq(workspaces.id, workspaceId));
 };
 
-export const getWorkspaceFolders = (
+export const getWorkspaceFolders = async (
   decodedToken: JwtProps,
   workspaceId: number
 ) => {
-  if (!(workspaceId in getAllUserWorkspaces(decodedToken)))
-    return NextResponse.json(
-      { message: "Action not allowed!" },
-      { status: 403 }
-    );
   return db
     .select()
     .from(folders)
