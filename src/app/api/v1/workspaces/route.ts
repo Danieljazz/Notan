@@ -16,9 +16,9 @@ export async function GET() {
       { status: 403 }
     );
   return getAllUserWorkspaces(decodedToken)
-    .then((userWorkspaces) => {
-      NextResponse.json({ message: userWorkspaces });
-    })
+    .then((userWorkspaces) =>
+      NextResponse.json({ message: userWorkspaces }, { status: 200 })
+    )
     .catch(() =>
       NextResponse.json({ message: "Internal server error" }, { status: 500 })
     );

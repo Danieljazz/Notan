@@ -9,6 +9,8 @@ import { rmSync } from "fs";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
+import { promises as fs } from "fs";
+import { files } from "@/lib/mysql/schema";
 
 export async function GET(
   request: NextRequest,
@@ -22,10 +24,16 @@ export async function GET(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
-  return getFile(decodedToken, fileId)
-    .then((file) => NextResponse.json({ message: file }))
+
+  const fileData = await getFile(decodedToken, fileId);
+  return await fs
+    .readFile(
+      path.join(String(process.env.NOTE_BASE_DIR), String(fileData[0].fileId)),
+      "utf-8"
+    )
+    .then((data) => NextResponse.json({ message: data }, { status: 200 }))
     .catch(() =>
-      NextResponse.json({ message: "Internal server error" }, { status: 500 })
+      NextResponse.json({ message: "Cannot open file" }, { status: 500 })
     );
 }
 

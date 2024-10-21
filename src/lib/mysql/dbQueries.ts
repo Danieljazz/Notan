@@ -4,7 +4,7 @@ import { files, folders, workspaces } from "./schema";
 import { JwtProps } from "../auth";
 import { NextResponse } from "next/server";
 import { WorkspaceSchema } from "../types";
-import { appendFile } from "fs";
+import * as fs from "fs";
 import path from "path";
 
 export const getAllUserWorkspaces = async (decodedToken: JwtProps) => {
@@ -70,13 +70,14 @@ export const getWorkspaceFolders = async (
   decodedToken: JwtProps,
   workspaceId: number
 ) => {
-  return db
-    .select()
-    .from(folders)
-    .leftJoin(
-      files,
-      and(eq(folders.workspaceId, workspaceId), eq(files.folderId, folders.id))
+  const result = db
+    .select({ folders })
+    .from(workspaces)
+    .innerJoin(
+      folders,
+      and(eq(folders.workspaceId, workspaceId), eq(workspaces.id, workspaceId))
     );
+  return (await result).map((item) => item.folders);
 };
 
 export const getFolder = async (decodedToken: JwtProps, folderId: number) => {
@@ -156,28 +157,24 @@ export const createFile = async (
     console.log("Action not allowed");
     throw new Error("Action not allowed!");
   }
-  return db.insert(files).values(fileData);
+  return "File has been created!";
 };
 
-export const getFile = async (
-  decodedToken: JwtProps,
-  fileId: number
-): Promise<InferSelectModel<typeof files>[]> => {
-  const folderId = await db.select().from(files).where(eq(files.id, fileId));
-  const dbResult = await db
+export const getFile = async (decodedToken: JwtProps, id: number) => {
+  const fileFolderId = await db.select().from(files).where(eq(files.id, id));
+  const folderId = await db
     .select()
     .from(folders)
-    .where(eq(folders.id, folderId[0].folderId));
+    .where(eq(folders.id, fileFolderId[0].folderId));
   if (
-    dbResult.length === 0 ||
+    folderId.length === 0 ||
     !(await getAllUserWorkspaces(decodedToken))
       .map((workspace) => workspace.id)
-      .includes(dbResult[0].workspaceId)
+      .includes(folderId[0].workspaceId)
   ) {
-    console.log("Action not allowed");
     throw new Error("Action not allowed!");
   }
-  return db.select().from(files).where(eq(files.id, fileId));
+  return db.select().from(files).where(eq(files.id, id));
 };
 
 export const deleteFile = async (decodedToken: JwtProps, fileId: number) => {

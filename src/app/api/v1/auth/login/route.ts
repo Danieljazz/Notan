@@ -10,7 +10,6 @@ import { cookies } from "next/headers";
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();
-  console.log("Email is", email);
   const nextcookies = cookies();
   try {
     const user = await db.query.users.findFirst({
@@ -42,7 +41,7 @@ export async function POST(request: Request) {
     nextcookies.set({
       name: "notan-credentials",
       value: token,
-      httpOnly: true,
+      httpOnly: false, //TODO: Maybe change
       secure: true,
     });
     return NextResponse.json({

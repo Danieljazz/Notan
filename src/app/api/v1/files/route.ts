@@ -6,6 +6,10 @@ import { createFile } from "@/lib/mysql/dbQueries";
 import { cookies } from "next/headers";
 import { verifyJwt } from "@/lib/auth";
 
+type fildeDataType = {
+  fileId: string;
+};
+
 export async function POST(request: NextRequest) {
   const jwtToken = cookies().get("notan-credentials")?.value;
   const decodedToken = await verifyJwt(jwtToken);
