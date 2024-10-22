@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     );
   const fileData = await request.json();
   const fileId = `${uuidv4()}.md`;
-  fileData["fileId"] = fileId;
+  fileData["docFileId"] = fileId;
   return createFile(decodedToken, fileData)
     .then((msg) => {
       appendFile(

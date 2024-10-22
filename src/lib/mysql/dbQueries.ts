@@ -154,9 +154,9 @@ export const createFile = async (
       .map((workspace) => workspace.id)
       .includes(dbResult[0].workspaceId)
   ) {
-    console.log("Action not allowed");
-    throw new Error("Action not allowed!");
+    return new Error("Action not allowed!");
   }
+  await db.insert(files).values(fileData);
   return "File has been created!";
 };
 
@@ -175,6 +175,29 @@ export const getFile = async (decodedToken: JwtProps, id: number) => {
     throw new Error("Action not allowed!");
   }
   return db.select().from(files).where(eq(files.id, id));
+};
+
+export const updateFile = async (
+  decodedToken: JwtProps,
+  fileData: Omit<InferSelectModel<typeof files>, "createdAt">
+) => {
+  const fileFolderId = await db
+    .select()
+    .from(files)
+    .where(eq(files.id, fileData.id));
+  const folderId = await db
+    .select()
+    .from(folders)
+    .where(eq(folders.id, fileFolderId[0].folderId));
+  if (
+    folderId.length === 0 ||
+    !(await getAllUserWorkspaces(decodedToken))
+      .map((workspace) => workspace.id)
+      .includes(folderId[0].workspaceId)
+  ) {
+    throw new Error("Action not allowed!");
+  }
+  return db.update(files).set(fileData).where(eq(files.id, fileData.id));
 };
 
 export const deleteFile = async (decodedToken: JwtProps, fileId: number) => {
