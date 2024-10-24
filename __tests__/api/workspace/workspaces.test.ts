@@ -46,30 +46,14 @@ describe("Create workspace", () => {
 const userWorkspaceId = 5;
 const userWorkspaceData = [
   {
-    files: null,
-    folders: {
-      bannerUrl: null,
-      createdAt: "2024-03-31 20:40:29",
-      icon: "",
-      id: 2,
-      inTrash: false,
-      logo: "",
-      title: "New folder",
-      workspaceId: 4,
-    },
-  },
-  {
-    files: null,
-    folders: {
-      bannerUrl: null,
-      createdAt: "2024-04-11 20:43:24",
-      icon: "",
-      id: 4,
-      inTrash: false,
-      logo: "",
-      title: "New folder",
-      workspaceId: 5,
-    },
+    bannerUrl: null,
+    createdAt: "2024-04-11 20:43:24",
+    icon: "",
+    id: 4,
+    inTrash: false,
+    logo: "",
+    title: "New folder",
+    workspaceId: 5,
   },
 ];
 describe("Get workspace", () => {
@@ -122,15 +106,15 @@ describe("Get workspace", () => {
   });
 });
 
-describe("Delete workspace", () => {
-  it("Authoritized user own workspace", async () => {
+describe("Get all user workspaces", () => {
+  it("Get logged user workspaces", async () => {
     const logresp = await fetch(`${testUrl}/auth/login`, {
       method: "POST",
       body: JSON.stringify(userData),
       credentials: "include",
     });
     expect(logresp.status).toBe(200);
-    const response = await fetch(`${testUrl}/workspaces/${userWorkspaceId}`, {
+    const response = await fetch(`${testUrl}/workspaces`, {
       method: "GET",
       headers: {
         Cookie: logresp.headers.getSetCookie()[0],
@@ -139,7 +123,48 @@ describe("Delete workspace", () => {
     expect(response).toBeDefined();
     expect(response.status).toBe(200);
     const data = await response.json();
-    expect(data).toEqual(userWorkspaceData);
+    const workspacesArray: (typeof userWorkspaceData)[0] &
+      {
+        workspaceOwner: number;
+      }[] = data["message"];
+    const workspacesIds = workspacesArray.map((item) => item.workspaceOwner);
+    const workspacesIdsWithoutDuplicates = [...new Set(workspacesIds)];
+    expect(workspacesIdsWithoutDuplicates).toEqual([1]);
+    expect(workspacesIdsWithoutDuplicates.length).toEqual(1);
+  });
+});
+
+describe("Delete workspace", () => {
+  it("Authoritized user own workspace", async () => {
+    const logresp = await fetch(`${testUrl}/auth/login`, {
+      method: "POST",
+      body: JSON.stringify(userData),
+      credentials: "include",
+    });
+    expect(logresp.status).toBe(200);
+    const response = await fetch(`${testUrl}/workspaces`, {
+      method: "GET",
+      headers: {
+        Cookie: logresp.headers.getSetCookie()[0],
+      },
+    });
+    expect(response).toBeDefined();
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    const workspaces = data["message"];
+    const lastWorkspaces = workspaces.at(-1);
+    const delResponse = await fetch(
+      `${testUrl}/workspaces/${lastWorkspaces.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          Cookie: logresp.headers.getSetCookie()[0],
+        },
+      }
+    );
+    expect(await delResponse.json()).toStrictEqual({
+      message: "Workspace deleted!",
+    });
   });
   it("Authoritized user others workspace", async () => {
     const logresp = await fetch(`${testUrl}/auth/login`, {
@@ -148,21 +173,21 @@ describe("Delete workspace", () => {
       credentials: "include",
     });
     expect(logresp.status).toBe(200);
-    const response = await fetch(`${testUrl}/workspaces/2`, {
-      method: "GET",
+    const delResponse = await fetch(`${testUrl}/workspaces/4`, {
+      method: "DELETE",
       headers: {
         Cookie: logresp.headers.getSetCookie()[0],
       },
     });
-    expect(response).toBeDefined();
-    expect(response.status).toBe(403);
-    expect(await response.json()).toStrictEqual({
+    expect(delResponse).toBeDefined();
+    expect(delResponse.status).toBe(403);
+    expect(await delResponse.json()).toStrictEqual({
       message: "Action not allowed!",
     });
   });
   it("Unathoritized user", async () => {
-    const response = await fetch(`${testUrl}/workspaces/5`, {
-      method: "GET",
+    const response = await fetch(`${testUrl}/workspaces/4`, {
+      method: "DELETE",
     });
     expect(response).toBeDefined();
     expect(response.status).toBe(403);

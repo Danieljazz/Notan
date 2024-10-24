@@ -80,6 +80,11 @@ export async function DELETE(
       { message: "Unathoritized user!" },
       { status: 403 }
     );
+  if (!(await checkIfUserIsWorkspaceOwner(decodedToken, workspaceId)))
+    return NextResponse.json(
+      { message: "Action not allowed!" },
+      { status: 403 }
+    );
   return deleteWorkspace(decodedToken, workspaceId)
     .then(() =>
       NextResponse.json({ message: "Workspace deleted!" }, { status: 201 })
